@@ -1,0 +1,120 @@
+﻿@model ICI.ProvaCandidato.Dados.Entities.Noticia
+
+<h2>@(Model.Id == 0 ? "Criar Notícia" : "Editar Notícia")</h2>
+
+<form asp-controller="Noticias" asp-action="Criar" method="post">
+    <div class="form-group">
+        <label for="Titulo">Título:</label>
+        <input type="text" class="form-control" id="Titulo" name="Titulo" value="@Model.Titulo" required oninput="limitarTitulo()">
+        <p id="contadorTitulo"></p>
+    </div>
+    <div class="form-group">
+        <label for="Texto">Texto:</label>
+        <textarea class="form-control" id="Texto" name="Texto" rows="5" required oninput="limitarTexto()">@Model.Texto</textarea>
+        <p id="contadorTexto"></p>
+    </div>
+    <div class="form-group">
+        <label for="TagsSelecionadas">Tags:</label>
+        <select multiple class="form-control" id="TagsSelecionadas" name="TagsSelecionadas">
+            @foreach (var tag in ViewBag.Tags as SelectList)
+            {
+                <option value="@tag.Value">@tag.Text</option>
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="UsuarioId">Usuário:</label>
+        <select class="form-control" id="UsuarioId" name="UsuarioId">
+            @foreach (var usuario in ViewBag.Usuarios as SelectList)
+            {
+                <option value="@usuario.Value">@usuario.Text</option>
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">
+            @{
+                var buttonText = Model.Id == 0 ? "Criar Notícia" : "Salvar Edição";
+                @Html.Raw(buttonText)
+                ;
+            }
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="limparCampos()">Limpar Campos</button>
+        <a href="/Noticias/Noticias" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>
+
+<script>
+    // Função para limpar os campos do formulário
+    function limparCampos() {
+        document.getElementById("Titulo").value = "";
+        document.getElementById("Texto").value = "";
+        // Limpar seleção de tags e usuário, se necessário
+        document.getElementById("TagsSelecionadas").selectedIndex = -1;
+        document.getElementById("UsuarioId").selectedIndex = -1;
+
+        // Redefinir o contador de título
+        document.getElementById("contadorTitulo").textContent = "Caracteres restantes: 30";
+
+        // Redefinir o contador de texto
+        document.getElementById("contadorTexto").textContent = "Caracteres restantes: 100";
+    }
+
+    // Função para limitar o título a 30 caracteres e exibir um contador regressivo
+    function limitarTitulo() {
+        var titulo = document.getElementById("Titulo").value;
+        var contador = document.getElementById("contadorTitulo");
+        var limite = 30;
+        var caracteresRestantes = limite - titulo.length;
+
+        contador.textContent = "Caracteres restantes: " + caracteresRestantes;
+
+        if (caracteresRestantes < 0) {
+            contador.style.color = "red";
+        } else {
+            contador.style.color = "black";
+        }
+
+        if (titulo.length > limite) {
+            document.getElementById("Titulo").value = titulo.slice(0, limite);
+        }
+    }
+
+    // Função para limitar o texto a 100 caracteres e exibir um contador regressivo
+    function limitarTexto() {
+        var texto = document.getElementById("Texto").value;
+        var contador = document.getElementById("contadorTexto");
+        var limite = 100;
+        var caracteresRestantes = limite - texto.length;
+
+        contador.textContent = "Caracteres restantes: " + caracteresRestantes;
+
+        if (caracteresRestantes < 0) {
+            contador.style.color = "red";
+        } else {
+            contador.style.color = "black";
+        }
+
+        if (texto.length > limite) {
+            document.getElementById("Texto").value = texto.slice(0, limite);
+        }
+    }
+
+    // Função para definir as opções selecionadas com base nos valores da notícia
+    function definirOpcoesSelecionadas() {
+        var tagsSelecionadas = @Html.Raw(Json.Serialize(Model.NoticiaTags?.Select(nt => nt.TagId).ToList()));
+        var usuarioSelecionado = @Html.Raw(Json.Serialize(Model.UsuarioId));
+
+        document.getElementById("TagsSelecionadas").value = tagsSelecionadas;
+        document.getElementById("UsuarioId").value = usuarioSelecionado;
+    }
+
+    // Chame a função ao carregar a página para definir as opções selecionadas
+    window.onload = definirOpcoesSelecionadas;
+
+    // Chame as funções de limite ao carregar a página
+    window.onload = function () {
+        limitarTitulo();
+        limitarTexto();
+    };
+</script>

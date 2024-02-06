@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Cadastro de Tag</title>
+    <!-- Adicione os links para os estilos CSS aqui, se necessário -->
+</head>
+<body>
+    @if (ViewData["Acao"] == "Cadastro")
+    {
+        <h2>Cadastro de Tag</h2>
+    }
+    else if (ViewData["Acao"] == "Edicao")
+    {
+        <h2>Edição de Tag</h2>
+    }
+
+    <form method="post" asp-controller="Home" asp-action="Cadastro">
+        <div class="form-group">
+            <label for="descricao">Descrição:</label>
+            <input type="text" id="descricao" name="Descricao" class="form-control" value="@ViewData["Descricao"]" maxlength="30" required />
+        </div>
+        <div class="form-group">
+            <p>Caracteres restantes: <span id="contador">30</span></p>
+        </div>
+        <input type="hidden" id="acao" name="Acao" value="@ViewData["Acao"]" />
+        @if (ViewData["Acao"] == "Cadastro")
+        {
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
+        }
+        else if (ViewData["Acao"] == "Edicao")
+        {
+            <button type="submit" class="btn btn-primary">Salvar Edição</button>
+        }
+
+        <a href="/Home/Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+
+    <script>
+        var descricaoInput = document.getElementById("descricao");
+        var contador = document.getElementById("contador");
+        var limiteCaracteres = 30;
+
+        descricaoInput.addEventListener("input", function () {
+            var caracteresDigitados = descricaoInput.value.length;
+            var caracteresRestantes = limiteCaracteres - caracteresDigitados;
+
+            contador.textContent = caracteresRestantes;
+
+            if (caracteresRestantes < 0) {
+                contador.style.color = "red";
+            } else {
+                contador.style.color = "black";
+            }
+        });
+    </script>
+</body>
+</html>

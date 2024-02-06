@@ -1,0 +1,82 @@
+﻿@model IEnumerable<ICI.ProvaCandidato.Dados.Entities.Noticia>
+
+<h2>Notícias Cadastradas</h2>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="form-group">
+            <input type="text" id="searchInput" class="form-control" placeholder="Pesquisar por Título">
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            <button type="button" class="btn btn-primary" id="searchButton">Pesquisar</button>
+        </div>
+    </div>
+    <div class="col-md-4 text-right">
+        <a href="@Url.Action("Criar", "Noticias")" class="btn btn-success">Criar Notícia</a>
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Texto</th>
+            <th>Autor</th>
+            <th>Tags</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var noticia in Model)
+        {
+            <tr>
+                <td>@noticia.Id</td>
+                <td>@Html.Raw(noticia.Titulo.Substring(0, Math.Min(50, noticia.Titulo.Length)))</td>
+                <td>@Html.Raw(noticia.Texto.Substring(0, Math.Min(100, noticia.Texto.Length)))</td>
+                <td>@noticia.Usuario.Nome</td>
+                <td>
+                    @foreach (var tag in noticia.NoticiaTags.Select(nt => nt.Tag))
+                    {
+                        <span class="badge badge-primary">@tag.Descricao</span>
+                    }
+                </td>
+                <td>
+                    <a href="@Url.Action("Criar", "Noticias", new { id = noticia.Id })" class="btn btn-primary btn-sm">Editar</a>
+                    <button type="button" class="btn btn-danger btn-sm"
+                            onclick="confirmDelete('@noticia.Id', '@noticia.Titulo')">
+                        Excluir
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    document.getElementById("searchButton").addEventListener("click", function () {
+        var searchTerm = document.getElementById("searchInput").value.toLowerCase();
+        var rows = document.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+
+        for (var i = 0; i < rows.length; i++) {
+            var titulo = rows[i].getElementsByTagName("td")[1].innerText.toLowerCase();
+
+            if (titulo.includes(searchTerm)) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    });
+
+    function confirmDelete(noticiaId, titulo) {
+        var confirmationMessage = `Você está prestes a excluir a Notícia: ${titulo}. Deseja continuar?`;
+
+        if (confirm(confirmationMessage)) {
+            // Redireciona para a ação ConfirmDelete no controlador NoticiasController
+            window.location.href = `/Noticias/ConfirmDelete/${noticiaId}`;
+        }
+    }
+</script>

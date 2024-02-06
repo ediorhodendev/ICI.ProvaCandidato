@@ -1,0 +1,72 @@
+﻿@model IEnumerable<ICI.ProvaCandidato.Dados.Entities.Usuario>
+
+<h2>Lista de Usuários</h2>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="form-group">
+            <input type="text" id="searchInput" class="form-control" placeholder="Pesquisar por Nome de Usuário">
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            <button type="button" class="btn btn-primary" id="searchButton">Pesquisar</button>
+        </div>
+    </div>
+    <div class="col-md-4 text-right">
+        <a asp-action="Criar" class="btn btn-success">Cadastrar Usuário</a>
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var usuario in Model)
+        {
+            <tr>
+                <td>@usuario.Id</td>
+                <td>@usuario.Nome</td>
+                <td>@usuario.Email</td>
+                <td>
+                    <a asp-action="Criar" asp-route-id="@usuario.Id" class="btn btn-primary btn-sm">Editar</a>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete(@usuario.Id, '@usuario.Nome')">Excluir</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    document.getElementById("searchButton").addEventListener("click", function () {
+        var searchTerm = document.getElementById("searchInput").value.toLowerCase();
+        var rows = document.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+
+        for (var i = 0; i < rows.length; i++) {
+            var nome = rows[i].getElementsByTagName("td")[1].innerText.toLowerCase();
+
+            if (nome.includes(searchTerm)) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    });
+
+    function confirmDelete(usuarioId, nome) {
+        var confirmationMessage = `Você está prestes a excluir o usuário: ${nome}. Deseja continuar?`;
+
+        if (confirm(confirmationMessage)) {
+            // Redireciona para a ação de exclusão no controlador
+            
+
+            window.location.href = `/Usuarios/ConfirmDelete/${usuarioId}`;
+        }
+    }
+</script>

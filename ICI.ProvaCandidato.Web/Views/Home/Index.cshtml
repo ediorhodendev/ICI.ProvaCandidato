@@ -1,0 +1,88 @@
+﻿@model IEnumerable<ICI.ProvaCandidato.Dados.Entities.Tag>
+
+<div class="container">
+    <h2 class="mt-3">Tags Cadastradas</h2>
+
+    <!-- Adicione este bloco para exibir mensagens de sucesso ou erro -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <div class="form-group">
+                
+                
+                <input type="text" id="searchInput" class="form-control" placeholder="Pesquisar por Título">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <button type="button" class="btn btn-primary btn-block" id="searchButton">Pesquisar</button>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="text-right">
+                <a href="@Url.Action("Cadastro", "Home")" class="btn btn-success">Cadastrar Nova Tag</a>
+            </div>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Descrição</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="tagTableBody">
+            @foreach (var tag in Model)
+            {
+                <tr>
+                    <td>@tag.Id</td>
+                    <td>@tag.Descricao</td>
+                    <td>
+                        <a href="@Url.Action("Cadastro", "Home", new { id = tag.Id })" class="btn btn-primary btn-sm">Editar</a>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('@tag.Id', '@tag.Descricao')">Excluir</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.getElementById("searchButton").addEventListener("click", function () {
+        var searchTerm = document.getElementById("searchInput").value.toLowerCase();
+        var rows = document.getElementById("tagTableBody").getElementsByTagName("tr");
+
+        for (var i = 0; i < rows.length; i++) {
+            var tagDescription = rows[i].getElementsByTagName("td")[1].innerText.toLowerCase();
+
+            if (tagDescription.includes(searchTerm)) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    });
+
+    function confirmDelete(tagId, descricao) {
+        var confirmationMessage = `Você está prestes a excluir a Tag: ${descricao}. Deseja continuar?`;
+
+        if (confirm(confirmationMessage)) {
+            // Redireciona para a ação ConfirmDelete no controlador HomeController
+            window.location.href = `/Home/ConfirmDelete/${tagId}`;
+        }
+    }
+</script>
